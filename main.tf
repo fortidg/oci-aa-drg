@@ -385,10 +385,10 @@ resource "oci_core_instance" "vm_fgt_a" {
   compartment_id      = var.compartment_ocid
   display_name        = "${var.PREFIX}-fgta"
   shape               = var.instance_shape
-  shape_config {
+  /* shape_config {
     memory_in_gbs = "16"
     ocpus         = "2"
-  }
+  } */
 
   create_vnic_details {
     subnet_id        = oci_core_subnet.untrusted_subnet.id
@@ -467,10 +467,10 @@ resource "oci_core_instance" "vm_fgt_b" {
   compartment_id      = var.compartment_ocid
   display_name        = "${var.PREFIX}-fgtb"
   shape               = var.instance_shape
-  shape_config {
+  /* shape_config {
     memory_in_gbs = "16"
     ocpus         = "2"
-  }
+  } */
 
   create_vnic_details {
     subnet_id        = oci_core_subnet.untrusted_subnet.id

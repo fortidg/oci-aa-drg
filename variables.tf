@@ -13,7 +13,7 @@ variable "PREFIX" {
 
 variable "region" {
   description = "Oracle Cloud region"
-  default = "us-ashburn-1"
+  default = "us-phoenix-1"
 }
 
 ##############################################################################################################
@@ -55,7 +55,7 @@ variable "ubu_shape" {
 ##############################################################################################################
 variable "instance_shape" {
   type    = string
-  default = "VM.Standard.E3.Flex "
+  default = "VM.Standard2.2"
 }
 
 variable "mp_listing_id" {
