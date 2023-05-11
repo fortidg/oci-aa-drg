@@ -108,6 +108,17 @@ resource "oci_core_security_list" "untrusted_security_list" {
     }
   }
 
+  // allow inbound http (port 8443) traffic
+  ingress_security_rules {
+    protocol = "6" // tcp
+    source   = "0.0.0.0/0"
+
+    tcp_options {
+      min = 8443
+      max = 8443
+    }
+  }
+
   // allow inbound ssh traffic
   ingress_security_rules {
     protocol  = "6" // tcp
@@ -117,6 +128,17 @@ resource "oci_core_security_list" "untrusted_security_list" {
     tcp_options {
       min = 22
       max = 22
+    }
+  }
+
+  ingress_security_rules {
+    protocol  = "6" // tcp
+    source    = "172.16.140.0/28"
+    stateless = false
+
+    tcp_options {
+      min = 8008
+      max = 8008
     }
   }
 
@@ -160,7 +182,7 @@ resource "oci_core_security_list" "trusted_security_list" {
     protocol    = "all"
   }
 
-  // allow inbound http (port 80) traffic
+  // allow inbound all 
   ingress_security_rules {
     protocol = "all" // tcp
     source   = "0.0.0.0/0"
@@ -622,7 +644,7 @@ resource "oci_network_load_balancer_listener" "nlb_trusted_listener" {
 resource "oci_network_load_balancer_backend_set" "nlb_trusted_backend_set" {
   health_checker {
     protocol = "TCP"
-    port     = 8008
+    port     = 8443
   }
 
   name                     = "${var.PREFIX}-trusted-backend-set"
@@ -636,7 +658,7 @@ resource "oci_network_load_balancer_backend" "nlb_trusted_backend_fgta" {
   network_load_balancer_id = oci_network_load_balancer_network_load_balancer.nlb_trusted.id
   port                     = 0
 
-  target_id = oci_core_instance.vm_fgt_a.id
+  ip_address = var.fgt_ipaddress_a["3"]
 }
 
 resource "oci_network_load_balancer_backend" "nlb_trusted_backend_fgtb" {
@@ -644,6 +666,6 @@ resource "oci_network_load_balancer_backend" "nlb_trusted_backend_fgtb" {
   network_load_balancer_id = oci_network_load_balancer_network_load_balancer.nlb_trusted.id
   port                     = 0
 
-  target_id = oci_core_instance.vm_fgt_b.id
+  ip_address = var.fgt_ipaddress_b["3"]
 }
 
