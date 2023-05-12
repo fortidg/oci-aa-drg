@@ -199,6 +199,12 @@ resource "oci_core_virtual_network" "vcn_spoke1" {
   dns_label      = "fgtspoke1"
 }
 
+// route table attachment
+resource "oci_core_route_table_attachment" "spoke1_route_table_attachment" {
+  subnet_id      = oci_core_subnet.spoke1-sub2.id
+  route_table_id = oci_core_route_table.spoke1_routetable.id
+}
+
 resource "oci_core_subnet" "spoke1-sub1" {
   cidr_block     = var.spoke1-subnet["1"]
   display_name   = "${var.PREFIX}-spoke1-sub1"
@@ -389,6 +395,8 @@ resource "oci_core_route_table" "spoke1_routetable" {
     destination_type  = "CIDR_BLOCK"
     network_entity_id = oci_core_drg.drg.id
   }
+}
+
 ##############################################################################################################
 ## FortiGate A
 ##############################################################################################################
