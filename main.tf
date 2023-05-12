@@ -158,7 +158,6 @@ resource "oci_core_subnet" "trusted_subnet" {
   display_name   = "${var.PREFIX}-trusted"
   compartment_id = var.compartment_ocid
   vcn_id         = oci_core_virtual_network.vcn.id
-#  route_table_id             = "${oci_core_route_table.trusted_routetable.id}"
   security_list_ids          = ["${oci_core_virtual_network.vcn.default_security_list_id}", "${oci_core_security_list.trusted_security_list.id}"]
   dhcp_options_id            = oci_core_virtual_network.vcn.default_dhcp_options_id
   dns_label                  = "fgttrusted"
@@ -166,10 +165,10 @@ resource "oci_core_subnet" "trusted_subnet" {
 }
 
 // route table attachment
-#resource "oci_core_route_table_attachment" "trust_route_table_attachment" {
-#  subnet_id      = oci_core_subnet.trusted_subnet.id
-#  route_table_id = oci_core_route_table.trusted_routetable.id
-#}
+resource "oci_core_route_table_attachment" "trust_route_table_attachment" {
+  subnet_id      = oci_core_subnet.trusted_subnet.id
+  route_table_id = oci_core_route_table.trusted_routetable.id
+}
 
 resource "oci_core_security_list" "trusted_security_list" {
   compartment_id = var.compartment_ocid
@@ -237,11 +236,6 @@ resource "oci_core_subnet" "spoke2-sub1" {
   display_name   = "${var.PREFIX}-spoke2-sub1"
   compartment_id = var.compartment_ocid
   vcn_id         = oci_core_virtual_network.vcn_spoke2.id
-  /* route_table_id             = "${oci_core_route_table.trusted_routetable.id}"
-  security_list_ids          = ["${oci_core_virtual_network.vcn.default_security_list_id}", "${oci_core_security_list.trusted_security_list.id}"]
-  dhcp_options_id            = oci_core_virtual_network.vcn.default_dhcp_options_id
-  dns_label                  = "fgttrusted"
-  prohibit_public_ip_on_vnic = true */
 }
 
 resource "oci_core_drg_attachment" "drg_spoke1_attachment" {
@@ -382,6 +376,19 @@ resource "oci_core_route_table" "drg_routetable" {
   }
 }
 
+resource "oci_core_route_table" "spoke1_routetable" {
+  compartment_id = var.compartment_ocid
+  vcn_id         = oci_core_virtual_network.vcn_spoke1.id
+  display_name   = "spoke1-routetable"
+
+
+  //Route to DRG
+  route_rules {
+    description       = "Default Route to FGT int"
+    destination       = "0.0.0.0/0"
+    destination_type  = "CIDR_BLOCK"
+    network_entity_id = oci_core_drg.drg.id
+  }
 ##############################################################################################################
 ## FortiGate A
 ##############################################################################################################
@@ -428,7 +435,6 @@ resource "oci_core_instance" "vm_fgt_a" {
   source_details {
     source_type = "image"
     source_id   = local.mp_listing_resource_id // marketplace listing
-    //source_id = "ocid1.image.oc1.phx.aaaaaaaalvrzh6j2edqh6s42rabhbhclwgnk4owdpjhqu5qsgtur7pc4lqaa"     // private image
     boot_volume_size_in_gbs = "50"
   }
 
@@ -436,7 +442,6 @@ resource "oci_core_instance" "vm_fgt_a" {
   // Commnet out the following if you use the feature.
   metadata = {
     user_data           = base64encode(data.template_file.custom_data_fgt_a.rendered)
-#    ssh_authorized_keys = file("~/.ssh/id_rsa.pub")
   }
 
   timeouts {
@@ -509,15 +514,13 @@ resource "oci_core_instance" "vm_fgt_b" {
   source_details {
     source_type = "image"
     source_id   = local.mp_listing_resource_id // marketplace listing
-    //source_id = "ocid1.image.oc1.phx.aaaaaaaalvrzh6j2edqh6s42rabhbhclwgnk4owdpjhqu5qsgtur7pc4lqaa"     // private image
-    boot_volume_size_in_gbs = "50"
+      boot_volume_size_in_gbs = "50"
   }
 
   // Required for bootstrap
   // Commnet out the following if you use the feature.
   metadata = {
     user_data           = "${base64encode(data.template_file.custom_data_fgt_b.rendered)}"
-#    ssh_authorized_keys = file("~/.ssh/id_rsa.pub")
   }
 
   timeouts {
@@ -644,7 +647,7 @@ resource "oci_network_load_balancer_listener" "nlb_trusted_listener" {
 resource "oci_network_load_balancer_backend_set" "nlb_trusted_backend_set" {
   health_checker {
     protocol = "TCP"
-    port     = 8443
+    port     = 8008
   }
 
   name                     = "${var.PREFIX}-trusted-backend-set"

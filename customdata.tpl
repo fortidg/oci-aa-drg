@@ -9,6 +9,7 @@ Content-Disposition: attachment; filename="config"
 
 config system global
   set hostname ${fgt_vm_name}
+  set admin-sport 8443
 end
 config system sdn-connector
   edit oci-sdn
@@ -22,11 +23,14 @@ config system probe-response
 end
 config system interface
   edit port1
+    set vdom root
     set alias untrusted
     set mode static
     set ip ${port1_ip}/${port1_mask}
     set allowaccess ping https ssh fgfm probe-response
   next
+end
+config system interface
   edit port2
     set vdom root
     set alias trusted
@@ -36,21 +40,27 @@ config system interface
   next
 end
 config router static
-  edit 1
+  edit 0
     set device port1
     set gateway ${untrusted_gateway_ip}
   next
-  edit 2
+end
+config router static
+  edit 0
     set device port2
     set dst ${vcn_cidr}
     set gateway ${trusted_gateway_ip}
   next
-  edit 3
+end
+config router static
+  edit 0
     set device port2
     set dst ${spoke1_cidr}
     set gateway ${trusted_gateway_ip}
   next
-  edit 4
+end
+config router static
+  edit 0
     set device port2
     set dst ${spoke2_cidr}
     set gateway ${trusted_gateway_ip}
