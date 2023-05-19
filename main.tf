@@ -593,7 +593,7 @@ resource "oci_network_load_balancer_network_load_balancer" "nlb_untrusted" {
   subnet_id      = oci_core_subnet.nlb_subnet.id
 
   is_private                     = false
-  is_preserve_source_destination = true
+  is_preserve_source_destination = false
 }
 
 resource "oci_network_load_balancer_listener" "nlb_untrusted_listener" {
