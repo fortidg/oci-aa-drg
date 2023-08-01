@@ -38,9 +38,7 @@ For the deployment, you can use the the OCI Portal or Terraform. This set of ter
 - compartment_ocid: id of the compartment to deploy the resources in
 - Authentication using API key: tenancy_ocid, user_ocid, private_key_path, fingerprint ([more info](https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/terraformproviderconfiguration.htm))
 
-### Oracle Cloud Portal
 
-[![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/40net-cloud/fortinet-oci-solutions/releases/download/artefacts/terraform-drgv2-hubspoke-aa.zip)
 
 ### Terraform
 
