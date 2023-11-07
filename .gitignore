@@ -10,4 +10,4 @@
 *.csv
 .terraform*
 *.pem
-
+*.bak
